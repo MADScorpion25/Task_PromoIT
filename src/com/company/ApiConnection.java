@@ -13,7 +13,7 @@ public class ApiConnection {
 
     public ApiConnection() {
         Random rnd = new Random();
-        url = "http://numbersapi.com/" + Math.abs(rnd.nextInt()) % 10000 + "/trivia";
+        url = "http://numbersapi.com/" + Math.abs(rnd.nextInt()) % 1001 + "/trivia";
     }
 
     private void setConnection() throws IOException {
