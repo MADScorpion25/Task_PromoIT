@@ -50,7 +50,7 @@ public class FrequencyDictionary {
     }
 
     public int getLettersAndDigitsCount() {
-        return string.replaceAll("[^A-Za-zА-Яа-я0-9]", "").length();
+        return string.replaceAll("[^A-Za-zА-Яа-я0-9ё]", "").length();
     }
 
     public float getAverageFrequency() {
