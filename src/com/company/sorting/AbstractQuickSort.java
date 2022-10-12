@@ -1,10 +1,9 @@
 package com.company.sorting;
 
-import com.company.interfaces.Sorting;
-
 import java.util.Comparator;
 
-public abstract class AbstractQuickSort<T> implements Sorting<T> {
+public abstract class AbstractQuickSort<T>{
+    public abstract void sort(Comparator<? super T> comparator, T[] data, int size);
     public int partition(T[] data, int left, int right, Comparator<? super T> comparator){
         T supportItem = data[right];
         int leftCursor = left;
