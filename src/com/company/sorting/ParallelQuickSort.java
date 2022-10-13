@@ -8,7 +8,7 @@ public class ParallelQuickSort<T> extends AbstractQuickSort<T> {
     public static int depth = 0;
     private int DELIMITER;
     private final int DEPTH_LIMIT = 400;
-    private final int PARALLEL_RANGE_START = 200_000;
+    private final int PARALLEL_RANGE_START = 150_000;
 
     public ParallelQuickSort(T[] data, Comparator<? super T> comparator) {
         super(data, comparator);
