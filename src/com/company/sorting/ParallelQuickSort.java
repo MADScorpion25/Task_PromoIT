@@ -18,17 +18,22 @@ public class ParallelQuickSort<T> extends AbstractQuickSort<T> {
         private int left;
         private int right;
         private Comparator<? super T> comparator;
+        private final int DELIMITER;
 
         public ParallelSortAction(T[] data, int left, int right, Comparator<? super T> comparator) {
             this.data = data;
             this.left = left;
             this.right = right;
             this.comparator = comparator;
+            DELIMITER = (data.length / 100) * (Runtime.getRuntime().availableProcessors() / 2);
         }
 
         @Override
         protected void compute() {
             if(left >= right) return;
+            if((right - left) <= DELIMITER){
+                new QuickSort<T>().quickSort(data, comparator, left, right);
+            }
             else{
                 int middle = partition(data, left, right, comparator);
 
