@@ -2,7 +2,8 @@ package com.company;
 
 import com.company.interfaces.AuthorHolder;
 import com.company.sorting.AbstractQuickSort;
-import com.company.sorting.ParallelQuickSortByCores;
+import com.company.sorting.ParallelQuickSort;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -233,7 +234,7 @@ public class CustomList<T> implements List<T>, AuthorHolder{
 
     @Override
     public void sort(Comparator<? super T> c) {
-        AbstractQuickSort<T> sort = new ParallelQuickSortByCores<>();
+        AbstractQuickSort<T> sort = new ParallelQuickSort<>();
         sort.sort(c, listData, size);
     }
 
