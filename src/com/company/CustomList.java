@@ -301,7 +301,7 @@ public class CustomList<T> implements List<T>, AuthorHolder{
 
         @Override
         public T next() {
-            if(cursor + 1 == size)
+            if(cursor == size)
                 throw new NoSuchElementException();
             return listData[cursor++];
         }
