@@ -15,7 +15,7 @@ public class ParallelQuickSort<T> extends AbstractQuickSort<T> {
 
     @Override
     public void sort(int size) {
-        DELIMITER = (getData().length / 100) * (5 / 2);
+        DELIMITER = (getData().length / 100) * (Runtime.getRuntime().availableProcessors() / 2);
         ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
         pool.invoke(new ParallelSortAction(0, size - 1));
         pool.shutdown();
