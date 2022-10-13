@@ -5,6 +5,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
 public class ParallelQuickSort<T> extends AbstractQuickSort<T> {
+    public static int depth = 0;
     private int DELIMITER;
     private final int DEPTH_LIMIT = 1000;
 
@@ -14,7 +15,7 @@ public class ParallelQuickSort<T> extends AbstractQuickSort<T> {
 
     @Override
     public void sort(int size) {
-        DELIMITER = (getData().length / 100) * (Runtime.getRuntime().availableProcessors() / 2);
+        DELIMITER = (getData().length / 100) * (5 / 2);
         ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
         pool.invoke(new ParallelSortAction(0, size - 1));
         pool.shutdown();

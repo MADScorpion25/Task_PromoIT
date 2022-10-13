@@ -3,7 +3,6 @@ package com.company.sorting;
 import java.util.Comparator;
 
 public abstract class AbstractQuickSort<T>{
-    public static int depth = 0;
     private T[] data;
     private Comparator<? super T> comparator;
 
