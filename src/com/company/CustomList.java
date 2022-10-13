@@ -234,8 +234,8 @@ public class CustomList<T> implements List<T>, AuthorHolder{
 
     @Override
     public void sort(Comparator<? super T> c) {
-        AbstractQuickSort<T> sort = new ParallelQuickSort<>();
-        sort.sort(c, listData, size);
+        AbstractQuickSort<T> sort = new ParallelQuickSort<T>(listData, c);
+        sort.sort(size);
     }
 
     private void checkLegalListCapacity(int extraSize){
