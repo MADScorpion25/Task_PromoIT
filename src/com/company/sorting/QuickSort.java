@@ -1,7 +1,5 @@
 package com.company.sorting;
 
-import com.company.interfaces.Sorting;
-
 import java.util.Comparator;
 
 public class QuickSort<T> extends AbstractQuickSort<T>{
