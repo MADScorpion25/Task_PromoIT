@@ -5,7 +5,7 @@ import java.util.Comparator;
 public abstract class AbstractQuickSort<T>{
     private T[] data;
     private Comparator<? super T> comparator;
-    public final int DEPTH_LIMIT = 400;
+    public final int DEPTH_LIMIT = 100;
 
     public AbstractQuickSort(T[] data, Comparator<? super T> comparator) {
         this.data = data;
