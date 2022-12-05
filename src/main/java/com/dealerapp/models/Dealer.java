@@ -1,6 +1,7 @@
 package com.dealerapp.models;
 
 import com.dealerapp.models.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,12 +10,8 @@ import java.util.Set;
 @Table(name = "dealers")
 @DiscriminatorValue("DEALER")
 public class Dealer extends User{
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "dealer_review",
-            joinColumns = { @JoinColumn(name = "dealer_id") },
-            inverseJoinColumns = { @JoinColumn(name = "review_id") }
-    )
+    @OneToMany(mappedBy="dealer")
+    @JsonIgnore
     private Set<Review> reviews;
 
     public Dealer() {

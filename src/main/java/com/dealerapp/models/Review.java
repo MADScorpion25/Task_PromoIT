@@ -19,18 +19,19 @@ public class Review {
     private String text;
     @Column(name = "img_path")
     private String imgPath;
-    @ManyToMany(mappedBy = "reviews")
-    private Set<Dealer> dealers;
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name="dealer_id", nullable = false)
+    private Dealer dealer;
 
     public Review() {
     }
 
-    public Review(long id, String title, String text, String imgPath, Set<Dealer> dealers) {
+    public Review(long id, String title, String text, String imgPath, Dealer dealer) {
         this.id = id;
         this.title = title;
         this.text = text;
         this.imgPath = imgPath;
-        this.dealers = dealers;
+        this.dealer = dealer;
     }
 
     public long getId() {
@@ -65,11 +66,11 @@ public class Review {
         this.imgPath = imgPath;
     }
 
-    public Set<Dealer> getDealers() {
-        return dealers;
+    public Dealer getDealer() {
+        return dealer;
     }
 
-    public void setDealers(Set<Dealer> dealers) {
-        this.dealers = dealers;
+    public void setDealer(Dealer dealer) {
+        this.dealer = dealer;
     }
 }

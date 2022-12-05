@@ -1,6 +1,7 @@
 package com.dealerapp.models;
 
 import com.dealerapp.models.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,7 +10,9 @@ import java.util.Set;
 @Table(name = "clients")
 @DiscriminatorValue("CLIENT")
 public class Client extends User{
+
     @OneToMany(mappedBy="client")
+    @JsonIgnore
     private Set<Order> orders;
 
     public Client() {
@@ -21,6 +24,7 @@ public class Client extends User{
         this.orders = orders;
         setRole(UserRole.CLIENT);
     }
+
 
     public Set<Order> getOrders() {
         return orders;

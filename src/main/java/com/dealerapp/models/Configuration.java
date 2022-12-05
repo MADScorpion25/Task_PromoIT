@@ -4,6 +4,8 @@ import com.dealerapp.models.enums.BodyType;
 import com.dealerapp.models.enums.CarClass;
 import com.dealerapp.models.enums.DriveType;
 import com.dealerapp.models.enums.TransmissionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +14,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "configurations")
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Configuration {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,12 +41,13 @@ public class Configuration {
     private String description;
     @Column(name = "img_path")
     private String imgPath;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
     @JoinColumn(name="car_id")
     private Car car;
-    @OneToMany(mappedBy="configuration")
+    @JsonIgnore
+    @OneToMany(mappedBy="configuration", cascade = CascadeType.ALL)
     private Set<Order> orders;
-    @Transient MultipartFile file;
 
     public Configuration() {
     }
@@ -61,22 +65,6 @@ public class Configuration {
         this.imgPath = imgPath;
         this.car = car;
         this.orders = orders;
-    }
-
-    public Configuration(long id, String configurationName, short power, int price, BodyType bodyType, CarClass carClass, DriveType driveType, TransmissionType transmissionType, String description, String imgPath, Car car, Set<Order> orders, MultipartFile file) {
-        this.id = id;
-        this.configurationName = configurationName;
-        this.power = power;
-        this.price = price;
-        this.bodyType = bodyType;
-        this.carClass = carClass;
-        this.driveType = driveType;
-        this.transmissionType = transmissionType;
-        this.description = description;
-        this.imgPath = imgPath;
-        this.car = car;
-        this.orders = orders;
-        this.file = file;
     }
 
     public long getId() {
@@ -159,6 +147,7 @@ public class Configuration {
         this.imgPath = imgPath;
     }
 
+    @JsonIgnore
     public Car getCar() {
         return car;
     }
@@ -167,19 +156,12 @@ public class Configuration {
         this.car = car;
     }
 
+    @JsonIgnore
     public Set<Order> getOrders() {
         return orders;
     }
 
     public void setOrders(Set<Order> orders) {
         this.orders = orders;
-    }
-
-    public MultipartFile getFile() {
-        return file;
-    }
-
-    public void setFile(MultipartFile file) {
-        this.file = file;
     }
 }

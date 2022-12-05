@@ -15,7 +15,7 @@ public class Car {
     private String modelName;
     @Column(name = "production_year", nullable = false)
     private short productionYear;
-    @OneToMany(mappedBy="car", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="car", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Set<Configuration> configurations;
 
     public Car() {

@@ -1,5 +1,7 @@
 package com.dealerapp.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -13,12 +15,14 @@ public class Order {
     private Date sendDate;
     @Column(name = "delivery_date")
     private Date deliveryDate;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name="client_id", nullable = false)
     private Client client;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name="configuration_id", nullable = false)
     private Configuration configuration;
+    @Column(name = "is_notified")
+    private boolean isNotified;
 
     public Order() {
     }
@@ -29,6 +33,16 @@ public class Order {
         this.deliveryDate = deliveryDate;
         this.client = client;
         this.configuration = configuration;
+        isNotified = false;
+    }
+
+    public Order(long id, Date sendDate, Date deliveryDate, Client client, Configuration configuration, boolean isNotified) {
+        this.id = id;
+        this.sendDate = sendDate;
+        this.deliveryDate = deliveryDate;
+        this.client = client;
+        this.configuration = configuration;
+        this.isNotified = isNotified;
     }
 
     public long getId() {
@@ -55,10 +69,12 @@ public class Order {
         this.deliveryDate = deliveryDate;
     }
 
+    @JsonIgnore
     public Client getClient() {
         return client;
     }
 
+    @JsonIgnore
     public void setClient(Client client) {
         this.client = client;
     }
@@ -69,5 +85,13 @@ public class Order {
 
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    public boolean isNotified() {
+        return isNotified;
+    }
+
+    public void setNotified(boolean notified) {
+        isNotified = notified;
     }
 }
