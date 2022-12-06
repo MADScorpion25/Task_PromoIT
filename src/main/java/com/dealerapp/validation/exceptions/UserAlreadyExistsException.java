@@ -1,4 +1,4 @@
-package com.dealerapp.validation;
+package com.dealerapp.validation.exceptions;
 
 public class UserAlreadyExistsException extends Exception{
     public UserAlreadyExistsException(String login) {

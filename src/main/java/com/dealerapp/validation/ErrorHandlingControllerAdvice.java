@@ -1,5 +1,9 @@
 package com.dealerapp.validation;
 
+import com.dealerapp.validation.exceptions.CarModelAlreadyExistsException;
+import com.dealerapp.validation.exceptions.ConfigurationAlreadyExists;
+import com.dealerapp.validation.exceptions.EntityNotFoundException;
+import com.dealerapp.validation.exceptions.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -62,6 +66,17 @@ public class ErrorHandlingControllerAdvice extends ResponseEntityExceptionHandle
     ) {
         List<Violation> violations = new ArrayList<>();
         violations.add(new Violation("Configuration Create", e.getMessage()));
+        return new ValidationErrorResponse(violations);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ValidationErrorResponse onEntityNotFoundException(
+            EntityNotFoundException e
+    ) {
+        List<Violation> violations = new ArrayList<>();
+        violations.add(new Violation("Entity Get", e.getMessage()));
         return new ValidationErrorResponse(violations);
     }
 }

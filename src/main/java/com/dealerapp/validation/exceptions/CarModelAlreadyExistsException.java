@@ -1,4 +1,4 @@
-package com.dealerapp.validation;
+package com.dealerapp.validation.exceptions;
 
 public class CarModelAlreadyExistsException extends Exception{
     public CarModelAlreadyExistsException(String model) {
