@@ -7,6 +7,8 @@ import com.dealerapp.models.Order;
 import com.dealerapp.services.MappingUtils;
 import com.dealerapp.services.OrderService;
 import com.dealerapp.services.UserService;
+import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
+import com.dealerapp.validation.exceptions.OrderNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,7 +38,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public OrderDto getOrder(@PathVariable long id){
+    public OrderDto getOrder(@PathVariable long id) throws OrderNotFoundException {
         return orderService.getOrderById(id);
     }
 
@@ -48,7 +50,7 @@ public class OrderController {
     }
 
     @PostMapping()
-    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) throws URISyntaxException, IOException {
+    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) throws URISyntaxException, IOException, ConfigurationNotFoundException {
         OrderDto saveOrder = orderService.saveOrder(orderDto);
         return ResponseEntity.created(new URI("/orders/" + saveOrder.getId())).body(saveOrder);
     }

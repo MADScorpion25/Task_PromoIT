@@ -4,9 +4,10 @@ import com.dealerapp.dto.CarDto;
 import com.dealerapp.models.Car;
 import com.dealerapp.models.Configuration;
 import com.dealerapp.repo.CarRepository;
-import com.dealerapp.validation.CarModelAlreadyExistsException;
+import com.dealerapp.validation.exceptions.CarModelAlreadyExistsException;
+import com.dealerapp.validation.exceptions.CarNotFoundException;
+import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -19,14 +20,14 @@ import java.util.stream.Collectors;
 @Validated
 @RequiredArgsConstructor
 public class CarService {
-    @Autowired
+
     private final CarRepository carRepository;
-    @Autowired
+
     private final ConfigurationService configurationService;
-    @Autowired
+
     private final MappingUtils mappingUtils;
 
-    public CarDto saveCar(@Valid CarDto carDto) throws IOException, CarModelAlreadyExistsException {
+    public CarDto saveCar(@Valid CarDto carDto) throws IOException, CarModelAlreadyExistsException, ConfigurationNotFoundException {
         if(carRepository.existsByModelName(carDto.getModelName())) throw new CarModelAlreadyExistsException(carDto.getModelName());
         Car car = mappingUtils.mapToReviewEntity(carDto);
 
@@ -44,7 +45,8 @@ public class CarService {
         Car newCar = carRepository.save(car);
         return mappingUtils.mapToReviewDto(newCar);
     }
-    public CarDto updateCar(@Valid CarDto carDto){
+
+    public CarDto updateCar(@Valid CarDto carDto) throws ConfigurationNotFoundException {
         Car currentCar = carRepository.getReferenceById(carDto.getId());
         currentCar.setBrandName(carDto.getBrandName());
         currentCar.setModelName(carDto.getModelName());
@@ -57,6 +59,7 @@ public class CarService {
             configs.add(configurationById);
             configurationById.setCar(currentCar);
         }
+
         for(Configuration cur : currentCar.getConfigurations()){
             if(!configs.contains(cur)){
                 cur.setCar(null);
@@ -66,15 +69,21 @@ public class CarService {
         currentCar = carRepository.save(currentCar);
         return mappingUtils.mapToReviewDto(currentCar);
     }
-    public void deleteCar(long id){
-        Car carById = carRepository.findById(id).get();
+
+    public void deleteCar(long id) throws CarNotFoundException {
+        Car carById = carRepository.findById(id)
+                .orElseThrow(() -> new CarNotFoundException(id));
+
         carById.getConfigurations().forEach(c -> c.setCar(null));
         carById.setConfigurations(null);
         carRepository.save(carById);
         carRepository.deleteById(id);
     }
-    public CarDto getCarById(long id){
-        Car referenceById = carRepository.findById(id).get();
+
+    public CarDto getCarById(long id) throws CarNotFoundException {
+        Car referenceById = carRepository.findById(id)
+                .orElseThrow(() -> new CarNotFoundException(id));
+
         CarDto carDto = carDtoAddition(referenceById);
 
         carDto.setFreeConfigs(configurationService.getFreeConfigurationsList());

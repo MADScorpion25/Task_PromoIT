@@ -1,15 +1,9 @@
 package com.dealerapp.controllers;
 
 import com.dealerapp.dto.ConfigurationDto;
-import com.dealerapp.models.Configuration;
-import com.dealerapp.models.enums.BodyType;
-import com.dealerapp.models.enums.CarClass;
-import com.dealerapp.models.enums.DriveType;
-import com.dealerapp.models.enums.TransmissionType;
 import com.dealerapp.services.ConfigurationService;
-import com.dealerapp.validation.ConfigurationAlreadyExists;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.dealerapp.validation.exceptions.ConfigurationAlreadyExists;
+import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/configurations")
 public class ConfigurationController {
-    @Autowired
+
     private final ConfigurationService configurationService;
 
     public ConfigurationController(ConfigurationService configurationService) {
@@ -39,24 +33,29 @@ public class ConfigurationController {
     public List<ConfigurationDto> getConfigurationsList(){
         return configurationService.getConfigurationsList();
     }
+
     @GetMapping("/body-types")
     public List<String> getBodyTypes(){
         return configurationService.getBodyTypes();
     }
+
     @GetMapping("/car-classes")
     public List<String> getCarClasses(){
         return configurationService.getCarClasses();
     }
+
     @GetMapping("/drive-types")
     public List<String> getDriveTypes(){
         return configurationService.getDriveTypes();
     }
+
     @GetMapping("/transmission-types")
     public List<String> getTransmissionTypes(){
         return configurationService.getTransmissionTypes();
     }
+
     @GetMapping("/{id}")
-    public ConfigurationDto getConfiguration(@PathVariable long id){
+    public ConfigurationDto getConfiguration(@PathVariable long id) throws ConfigurationNotFoundException {
         return configurationService.getConfigurationById(id);
     }
 
@@ -75,7 +74,7 @@ public class ConfigurationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ConfigurationDto> deleteConfiguration(@PathVariable Long id){
+    public ResponseEntity<ConfigurationDto> deleteConfiguration(@PathVariable Long id) throws ConfigurationNotFoundException {
         configurationService.deleteConfiguration(id);
         return ResponseEntity.ok().build();
     }

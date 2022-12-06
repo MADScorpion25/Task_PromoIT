@@ -6,6 +6,7 @@ import com.dealerapp.models.Client;
 import com.dealerapp.models.Dealer;
 import com.dealerapp.models.User;
 import com.dealerapp.services.UserService;
+import com.dealerapp.validation.exceptions.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import java.util.List;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    @Autowired
+
     private final UserService userService;
 
     @GetMapping("/info/{id}")
@@ -47,7 +48,7 @@ public class UserController {
     }
 
     @PutMapping("/edit/{id}")
-    public User updateUser(@RequestBody UserDto userDto){
+    public User updateUser(@RequestBody UserDto userDto) throws UserNotFoundException {
         return userService.updateUser(userDto);
     }
 

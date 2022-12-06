@@ -2,21 +2,20 @@ package com.dealerapp.services;
 
 import com.dealerapp.dto.ReviewDto;
 import com.dealerapp.dto.UserDto;
-import com.dealerapp.models.*;
+import com.dealerapp.models.Dealer;
+import com.dealerapp.models.Review;
 import com.dealerapp.repo.ReviewRepository;
+import com.dealerapp.validation.exceptions.ReviewNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.dealerapp.services.ImgService.deleteImg;
@@ -26,18 +25,20 @@ import static com.dealerapp.services.ImgService.uploadImg;
 @Validated
 @RequiredArgsConstructor
 public class ReviewService {
+
     @Value("${upload.path}")
     private String path;
 
-    @Autowired
     private final ReviewRepository reviewRepository;
-    @Autowired
+
     private final MappingUtils mappingUtils;
-    @Autowired
+
     private final UserService userService;
 
-    public ReviewDto getReviewById(long id){
-        return mappingUtils.mapToReviewDto(reviewRepository.getReferenceById(id));
+    public ReviewDto getReviewById(long id) throws ReviewNotFoundException {
+        return mappingUtils.mapToReviewDto(
+                reviewRepository.findById(id)
+                        .orElseThrow(() -> new ReviewNotFoundException(id)));
     }
 
     public List<ReviewDto> getReviewsList(){
@@ -52,9 +53,10 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public ReviewDto updateReview(@Valid ReviewDto reviewDto, MultipartFile fileUp) throws IOException {
+    public ReviewDto updateReview(@Valid ReviewDto reviewDto, MultipartFile fileUp) throws IOException, ReviewNotFoundException {
         Review review = mappingUtils.mapToReviewEntity(reviewDto);
-        Review currentReview = reviewRepository.getReferenceById(review.getId());
+        Review currentReview = reviewRepository.findById(reviewDto.getId())
+                .orElseThrow(() -> new ReviewNotFoundException(reviewDto.getId()));
 
         UserDto userDto = userService.getUserByLogin(reviewDto.getDealerLogin());
         Dealer dealer = (Dealer)mappingUtils.mapToReviewEntity(userDto);
@@ -66,7 +68,7 @@ public class ReviewService {
         String imgFileName = "";
         if(fileUp != null)imgFileName = uploadImg(fileUp, path);
         else review.setImgPath(currentReview.getImgPath());
-        if(!"".equals(imgFileName)) {
+        if(StringUtils.hasLength(imgFileName)) {
             deleteImg(currentReview.getImgPath(), path);
             review.setImgPath(imgFileName);
             currentReview.setImgPath(imgFileName);
@@ -84,13 +86,13 @@ public class ReviewService {
         review.setDealer(dealer);
 
         String imgFileName = uploadImg(file, path);
-        if(!"".equals(imgFileName)) review.setImgPath(imgFileName);
+        if(StringUtils.hasLength(imgFileName)) review.setImgPath(imgFileName);
 
         return mappingUtils.mapToReviewDto(reviewRepository.save(review));
     }
 
-    public void deleteReview(long id){
-        Review review = reviewRepository.findById(id).get();
+    public void deleteReview(long id) throws ReviewNotFoundException {
+        Review review = reviewRepository.findById(id).orElseThrow(() -> new ReviewNotFoundException(id));
         deleteImg(review.getImgPath(), path);
         reviewRepository.deleteById(id);
     }

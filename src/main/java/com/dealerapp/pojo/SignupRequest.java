@@ -1,45 +1,15 @@
 package com.dealerapp.pojo;
 
+import lombok.Data;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+@Data
 public class SignupRequest {
     @Email
     private String login;
     @NotBlank
     private String password;
     private String role;
-
-    public SignupRequest() {
-    }
-
-    public SignupRequest(String login, String password, String role) {
-        this.login = login;
-        this.password = password;
-        this.role = role;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 }

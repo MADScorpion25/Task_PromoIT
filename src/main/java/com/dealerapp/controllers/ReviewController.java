@@ -9,6 +9,7 @@ import com.dealerapp.models.Review;
 import com.dealerapp.services.MappingUtils;
 import com.dealerapp.services.ReviewService;
 import com.dealerapp.services.UserService;
+import com.dealerapp.validation.exceptions.ReviewNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,11 @@ import java.util.List;
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
-    @Autowired
+
     private final ReviewService reviewService;
-    @Autowired
+
     private final UserService userService;
-    @Autowired
+
     private final MappingUtils mappingUtils;
 
     @GetMapping
@@ -39,7 +40,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public ReviewDto getReview(@PathVariable long id){
+    public ReviewDto getReview(@PathVariable long id) throws ReviewNotFoundException {
         return reviewService.getReviewById(id);
     }
 
@@ -58,13 +59,13 @@ public class ReviewController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/edit/{id}")
-    public ResponseEntity<ReviewDto> updateReview(@PathVariable Long id, @ModelAttribute ReviewDto reviewDto, @RequestParam(value = "fileUp", required = false) MultipartFile file) throws IOException {
+    public ResponseEntity<ReviewDto> updateReview(@PathVariable Long id, @ModelAttribute ReviewDto reviewDto, @RequestParam(value = "fileUp", required = false) MultipartFile file) throws IOException, ReviewNotFoundException {
         ReviewDto review = reviewService.updateReview(reviewDto, file);
         return ResponseEntity.ok(review);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ReviewDto> deleteReview(@PathVariable long id){
+    public ResponseEntity<ReviewDto> deleteReview(@PathVariable long id) throws ReviewNotFoundException {
         reviewService.deleteReview(id);
         return ResponseEntity.ok().build();
     }

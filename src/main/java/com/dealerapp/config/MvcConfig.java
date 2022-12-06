@@ -4,6 +4,7 @@ import com.dealerapp.config.jwt.AuthEntryPointJwt;
 import com.dealerapp.config.jwt.AuthTokenFilter;
 import com.dealerapp.models.enums.UserRole;
 import com.dealerapp.services.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,15 +28,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebMvc
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class MvcConfig implements WebMvcConfigurer {
     @Value("${upload.path}")
     private String path;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private AuthEntryPointJwt authEntryPointJwt;
+    private final AuthEntryPointJwt authEntryPointJwt;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -51,7 +51,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/*").not().fullyAuthenticated()
+                .antMatchers("/auth/sign-in", "/auth/register").not().fullyAuthenticated()
                 .antMatchers("/orders/edit/:id", "/orders/*", "/configurations/transmission-types", "/configurations/drive-types", "/configurations/body-types", "/configurations/car-classes", "/configurations/edit/:id", "/configurations/*", "/cars/edit/:id", "/cars/*").hasAuthority(UserRole.DEALER.name())
                 .antMatchers("/users/*", "/users/*/*", "/auth/*").hasAuthority(UserRole.ADMIN.name())
                 .antMatchers("/orders/edit/:id", "/orders/*").hasAuthority(UserRole.CLIENT.name())

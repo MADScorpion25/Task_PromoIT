@@ -2,19 +2,14 @@ package com.dealerapp.controllers;
 
 import com.dealerapp.config.jwt.JwtUtils;
 import com.dealerapp.dto.UserDto;
-import com.dealerapp.models.Admin;
-import com.dealerapp.models.Client;
-import com.dealerapp.models.User;
-import com.dealerapp.models.enums.UserRole;
 import com.dealerapp.pojo.JwtResponse;
 import com.dealerapp.pojo.LoginRequest;
 import com.dealerapp.pojo.MessageResponse;
 import com.dealerapp.pojo.SignupRequest;
-import com.dealerapp.repo.UserRepository;
 import com.dealerapp.security.UserDetailsImpl;
 import com.dealerapp.services.UserService;
-import com.dealerapp.validation.UserAlreadyExistsException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dealerapp.validation.exceptions.UserAlreadyExistsException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,18 +29,15 @@ import java.util.stream.Collectors;
 @RestController
 @Validated
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final  JwtUtils jwtUtils;
 
     @PostMapping("/sign-in")
     public ResponseEntity authUser(@RequestBody LoginRequest loginRequest){

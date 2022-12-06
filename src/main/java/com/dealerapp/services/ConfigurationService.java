@@ -9,11 +9,12 @@ import com.dealerapp.models.enums.CarClass;
 import com.dealerapp.models.enums.DriveType;
 import com.dealerapp.models.enums.TransmissionType;
 import com.dealerapp.repo.ConfigurationRepository;
-import com.dealerapp.validation.ConfigurationAlreadyExists;
+import com.dealerapp.validation.exceptions.ConfigurationAlreadyExists;
+import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,9 +33,9 @@ import static java.util.stream.Collectors.toSet;
 @Validated
 @RequiredArgsConstructor
 public class ConfigurationService {
-    @Autowired
+
     private final ConfigurationRepository configurationRepository;
-    @Autowired
+
     private final MappingUtils mappingUtils;
 
     @Value("${upload.path}")
@@ -45,7 +46,7 @@ public class ConfigurationService {
             throw new ConfigurationAlreadyExists(configurationDto.getConfigurationName());
         Configuration configuration = mappingUtils.mapToReviewEntity(configurationDto);
         String imgFileName = uploadImg(file, path);
-        if(!"".equals(imgFileName)) configuration.setImgPath(imgFileName);
+        if(StringUtils.hasLength(imgFileName)) configuration.setImgPath(imgFileName);
         return mappingUtils.mapToReviewDto(configurationRepository.save(configuration));
     }
 
@@ -65,7 +66,7 @@ public class ConfigurationService {
         String imgFileName = "";
         if(fileUp != null)imgFileName = uploadImg(fileUp, path);
         else car.setImgPath(currentConfiguration.getImgPath());
-        if(!"".equals(imgFileName)) {
+        if(StringUtils.hasLength(imgFileName)) {
             deleteImg(currentConfiguration.getImgPath(), path);
             car.setImgPath(imgFileName);
             currentConfiguration.setImgPath(imgFileName);
@@ -75,20 +76,24 @@ public class ConfigurationService {
         return mappingUtils.mapToReviewDto(currentConfiguration);
     }
 
-    public ConfigurationDto getConfigurationByName(String name){
-        return configurationDtoAddition(configurationRepository.findByConfigurationName(name));
+    public ConfigurationDto getConfigurationByName(String name) throws ConfigurationNotFoundException {
+      return configurationDtoAddition(
+                configurationRepository.findByConfigurationName(name)
+                        .orElseThrow(() ->  new ConfigurationNotFoundException(name)));
     }
 
-    public void deleteConfiguration(long id){
-        Configuration configuration = configurationRepository.findById(id).get();
+    public void deleteConfiguration(long id) throws ConfigurationNotFoundException {
+        Configuration configuration = configurationRepository.findById(id).orElseThrow(() ->  new ConfigurationNotFoundException(id));
         configuration.setCar(null);
 
         deleteImg(configuration.getImgPath(), path);
         configurationRepository.deleteById(id);
     }
 
-    public ConfigurationDto getConfigurationById(long id){
-        return configurationDtoAddition(configurationRepository.findById(id).get());
+    public ConfigurationDto getConfigurationById(long id) throws ConfigurationNotFoundException {
+        return configurationDtoAddition(
+                configurationRepository.findById(id)
+                        .orElseThrow(() ->  new ConfigurationNotFoundException(id)));
     }
 
     public String[] getFreeConfigurationsList(){

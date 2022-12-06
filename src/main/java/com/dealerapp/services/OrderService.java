@@ -2,13 +2,13 @@ package com.dealerapp.services;
 
 import com.dealerapp.dto.OrderDto;
 import com.dealerapp.dto.UserDto;
-import com.dealerapp.email.EmailServiceImpl;
 import com.dealerapp.models.Client;
 import com.dealerapp.models.Configuration;
 import com.dealerapp.models.Order;
 import com.dealerapp.repo.OrderRepository;
+import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
+import com.dealerapp.validation.exceptions.OrderNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,17 +22,17 @@ import java.util.stream.Collectors;
 @Validated
 @RequiredArgsConstructor
 public class OrderService {
-    @Autowired
+
     private final OrderRepository orderRepository;
-    @Autowired
+
     private final UserService userService;
-    @Autowired
+
     private final ConfigurationService configurationService;
-    @Autowired
+
     private final MappingUtils mappingUtils;
 
-    public OrderDto getOrderById(long id){
-        Order referenceById = orderRepository.getReferenceById(id);
+    public OrderDto getOrderById(long id) throws OrderNotFoundException {
+        Order referenceById = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
         return orderAddition(referenceById);
     }
 
@@ -42,7 +42,7 @@ public class OrderService {
         return all.stream().map(this::orderAddition).collect(Collectors.toList());
     }
 
-    public OrderDto saveOrder(@Valid OrderDto orderDto) throws IOException {
+    public OrderDto saveOrder(@Valid OrderDto orderDto) throws IOException, ConfigurationNotFoundException {
         orderDto.setSendDate(new Date());
         Order order = mappingUtils.mapToReviewEntity(orderDto);
 
@@ -75,12 +75,15 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    private OrderDto orderAddition(Order order){
+    private OrderDto orderAddition(Order order) {
         OrderDto orderDto = mappingUtils.mapToReviewDto(order);
         orderDto.setCustomerLogin(order.getClient().getLogin());
-        Configuration conf = mappingUtils.mapToReviewEntity(
-                configurationService.getConfigurationById(order.getConfiguration().getId()));
-        orderDto.setConfiguration(mappingUtils.mapToReviewDto(conf));
+        try {
+            Configuration conf = mappingUtils.mapToReviewEntity(
+                    configurationService.getConfigurationById(order.getConfiguration().getId()));
+            orderDto.setConfiguration(mappingUtils.mapToReviewDto(conf));
+        } catch (ConfigurationNotFoundException ignored) {
+        }
         return orderDto;
     }
 }

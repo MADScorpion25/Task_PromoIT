@@ -1,6 +1,5 @@
 package com.dealerapp.dto;
 
-import com.dealerapp.models.Configuration;
 import lombok.Data;
 
 import javax.validation.constraints.Max;
@@ -11,9 +10,9 @@ import java.util.Set;
 @Data
 public class CarDto {
     private long id;
-    @NotBlank
+    @NotBlank(message = "Car's brand name cannot be empty")
     private String brandName;
-    @NotBlank
+    @NotBlank(message = "Car's model name cannot be empty")
     private String modelName;
     @Min(value = 1900)
     @Max(value = 2022)

@@ -16,7 +16,7 @@ import java.util.Set;
 @Data
 public class ConfigurationDto {
     private long id;
-    @NotBlank
+    @NotBlank(message = "Configuration's name cannot be empty")
     private String configurationName;
     @Min(value = 50)
     @Max(value = 500)
@@ -24,15 +24,15 @@ public class ConfigurationDto {
     @Min(value = 10_000)
     @Max(value = 10_000_000)
     private int price;
-    @NotNull
+    @NotNull(message = "Please, choose configuration body type")
     private BodyType bodyType;
-    @NotNull
+    @NotNull(message = "Please, choose configuration car class")
     private CarClass carClass;
-    @NotNull
+    @NotNull(message = "Please, choose configuration drive type")
     private DriveType driveType;
-    @NotNull
+    @NotNull(message = "Please, choose configuration transmission type")
     private TransmissionType transmissionType;
-    @NotBlank
+    @NotBlank(message = "Configuration's description cannot be empty")
     private String description;
     private String imgPath;
     private MultipartFile file;

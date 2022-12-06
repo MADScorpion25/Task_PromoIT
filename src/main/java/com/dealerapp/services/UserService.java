@@ -10,11 +10,12 @@ import com.dealerapp.repo.AdminRepository;
 import com.dealerapp.repo.ClientRepository;
 import com.dealerapp.repo.DealerRepository;
 import com.dealerapp.repo.UserRepository;
-import com.dealerapp.validation.UserAlreadyExistsException;
+import com.dealerapp.validation.exceptions.UserAlreadyExistsException;
+import com.dealerapp.validation.exceptions.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -27,17 +28,17 @@ import static java.util.stream.Collectors.toList;
 @Validated
 @RequiredArgsConstructor
 public class UserService {
-    @Autowired
+
     private final UserRepository userRepository;
-    @Autowired
+
     private final AdminRepository adminRepository;
-    @Autowired
+
     private final DealerRepository dealerRepository;
-    @Autowired
+
     private final ClientRepository clientRepository;
-    @Autowired
+
     private final PasswordEncoder encoder;
-    @Autowired
+
     private final MappingUtils mappingUtils;
 
     public void register(@Valid UserDto userDto) throws UserAlreadyExistsException {
@@ -93,10 +94,11 @@ public class UserService {
         return Arrays.stream(UserRole.values()).map(UserRole::toString).collect(toList());
     }
 
-    public User updateUser(@Valid UserDto userDto){
-        User currentUser = userRepository.getReferenceById(userDto.getId());
+    public User updateUser(@Valid UserDto userDto) throws UserNotFoundException {
+        User currentUser = userRepository.findById(userDto.getId())
+                .orElseThrow(() -> new UserNotFoundException(userDto.getId()));
 
-        if(!"".equals(userDto.getPassword())) userDto.setPassword(encoder.encode(userDto.getPassword()));
+        if(StringUtils.hasLength(userDto.getPassword())) userDto.setPassword(encoder.encode(userDto.getPassword()));
         else userDto.setPassword(currentUser.getPassword());
 
         currentUser.setLogin(userDto.getLogin());
