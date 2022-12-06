@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/cars")
 @RequiredArgsConstructor
 public class CarController {
-    
+
     private final CarService carService;
 
     @GetMapping
