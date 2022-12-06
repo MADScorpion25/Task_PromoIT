@@ -6,6 +6,7 @@ import com.dealerapp.services.CarService;
 import com.dealerapp.validation.exceptions.CarModelAlreadyExistsException;
 import com.dealerapp.validation.exceptions.CarNotFoundException;
 import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +18,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cars")
+@RequiredArgsConstructor
 public class CarController {
-    @Autowired
+    
     private final CarService carService;
-
-    public CarController(CarService carService) {
-        this.carService = carService;
-    }
 
     @GetMapping
     public List<CarDto> getCars(){
