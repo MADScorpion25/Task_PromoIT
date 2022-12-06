@@ -17,10 +17,8 @@ import java.util.stream.Collectors;
 public class EmailSchedulerService {
     private static final String CRON = "*/10 * * * * *";
 
-    @Autowired
     private final OrderService orderService;
 
-    @Autowired
     private final EmailService emailService;
 
     @Scheduled(cron = CRON)
