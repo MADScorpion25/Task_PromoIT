@@ -1,4 +1,5 @@
 import {Component} from "react";
+import Notification  from "rc-notification"
 
 class RegisterPage extends Component{
     emptyItem = {
@@ -27,14 +28,16 @@ class RegisterPage extends Component{
 
 
     componentDidMount() {
-        fetch("/users/roles",
-            {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("session-token")}`
-                }
-            })
-            .then(types => types.json())
-            .then(data => this.setState({roles: data}))
+        if(sessionStorage.getItem("user-role") === "ADMIN") {
+            fetch("/users/roles",
+                {
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem("session-token")}`
+                    }
+                })
+                .then(types => types.json())
+                .then(data => this.setState({roles: data}))
+        }
     }
 
     async handleSubmit(event) {
@@ -43,7 +46,7 @@ class RegisterPage extends Component{
 
         console.log(item)
         let role = sessionStorage.getItem("user-role")
-        await fetch(role === "ADMIN" ? '/users/new' : '/users/register', {
+        await fetch(role === "ADMIN" ? '/users/new' : '/auth/register', {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${sessionStorage.getItem("session-token")}`,
@@ -51,7 +54,15 @@ class RegisterPage extends Component{
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(item),
-        });
+        })
+            .catch(error => {
+                Notification.newInstance({}, notification => {
+                    notification.notice({
+                        content: error.message
+                    });
+                });
+
+            });
 
         this.props.history.push('/');
     }
