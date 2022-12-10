@@ -66,8 +66,13 @@ public class ReviewService {
         currentReview.setText(review.getText());
 
         String imgFileName = "";
-        if(fileUp != null)imgFileName = uploadImg(fileUp, path);
-        else review.setImgPath(currentReview.getImgPath());
+        if(fileUp != null) {
+            imgFileName = uploadImg(fileUp, path);
+        }
+        else {
+            review.setImgPath(currentReview.getImgPath());
+        }
+
         if(StringUtils.hasLength(imgFileName)) {
             deleteImg(currentReview.getImgPath(), path);
             review.setImgPath(imgFileName);

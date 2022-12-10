@@ -114,8 +114,9 @@ public class UserService {
         return userDtoAddition(user);
     }
 
-    public UserDto getUserByLogin(String login){
-        User user = userRepository.findByLogin(login).get();
+    public UserDto getUserByLogin(String login) throws UserNotFoundException {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
         return userDtoAddition(user);
     }
 

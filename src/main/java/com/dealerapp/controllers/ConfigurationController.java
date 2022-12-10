@@ -25,7 +25,7 @@ public class ConfigurationController {
     }
 
     @GetMapping("/free")
-    public String[] getFreeConfigurations(){
+    public List<String> getFreeConfigurations(){
         return configurationService.getFreeConfigurationsList();
     }
 

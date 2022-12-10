@@ -9,6 +9,7 @@ import com.dealerapp.validation.exceptions.CarNotFoundException;
 import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -27,6 +28,7 @@ public class CarService {
 
     private final MappingUtils mappingUtils;
 
+    @Transactional
     public CarDto saveCar(@Valid CarDto carDto) throws IOException, CarModelAlreadyExistsException, ConfigurationNotFoundException {
         if(carRepository.existsByModelName(carDto.getModelName())) throw new CarModelAlreadyExistsException(carDto.getModelName());
         Car car = mappingUtils.mapToReviewEntity(carDto);
@@ -46,6 +48,7 @@ public class CarService {
         return mappingUtils.mapToReviewDto(newCar);
     }
 
+    @Transactional
     public CarDto updateCar(@Valid CarDto carDto) throws ConfigurationNotFoundException {
         Car currentCar = carRepository.getReferenceById(carDto.getId());
         currentCar.setBrandName(carDto.getBrandName());
@@ -70,6 +73,7 @@ public class CarService {
         return mappingUtils.mapToReviewDto(currentCar);
     }
 
+    @Transactional
     public void deleteCar(long id) throws CarNotFoundException {
         Car carById = carRepository.findById(id)
                 .orElseThrow(() -> new CarNotFoundException(id));
@@ -88,12 +92,10 @@ public class CarService {
 
         carDto.setFreeConfigs(configurationService.getFreeConfigurationsList());
 
-        String[] list = new String[referenceById.getConfigurations().size()];
-        Configuration[] configs = referenceById.getConfigurations().toArray(new Configuration[0]);
-        for (int i = 0; i < list.length; i++) {
+        List<String> list = new ArrayList<>(referenceById.getConfigurations().size());
+        Set<Configuration> configs = referenceById.getConfigurations();
 
-            list[i] = configs[i].getConfigurationName();
-        }
+        configs.forEach((conf) -> list.add(conf.getConfigurationName()));
         carDto.setCurConfigs(list);
         return carDto;
     }

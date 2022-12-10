@@ -5,8 +5,6 @@ import com.dealerapp.config.jwt.AuthTokenFilter;
 import com.dealerapp.models.enums.UserRole;
 import com.dealerapp.services.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -85,10 +83,4 @@ public class MvcConfig implements WebMvcConfigurer {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
-
 }

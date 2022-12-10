@@ -14,6 +14,7 @@ import com.dealerapp.validation.exceptions.ConfigurationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +42,7 @@ public class ConfigurationService {
     @Value("${upload.path}")
     private String path;
 
+    @Transactional
     public ConfigurationDto saveConfiguration(@Valid ConfigurationDto configurationDto, MultipartFile file) throws IOException, ConfigurationAlreadyExists {
         if(configurationRepository.existsByConfigurationName(configurationDto.getConfigurationName()))
             throw new ConfigurationAlreadyExists(configurationDto.getConfigurationName());
@@ -50,6 +52,7 @@ public class ConfigurationService {
         return mappingUtils.mapToReviewDto(configurationRepository.save(configuration));
     }
 
+    @Transactional
     public ConfigurationDto updateConfiguration(@Valid ConfigurationDto configurationDto, MultipartFile fileUp) throws IOException {
         Configuration car = mappingUtils.mapToReviewEntity(configurationDto);
         Configuration currentConfiguration = configurationRepository.getReferenceById(car.getId());
@@ -64,8 +67,13 @@ public class ConfigurationService {
         currentConfiguration.setDriveType(car.getDriveType());
 
         String imgFileName = "";
-        if(fileUp != null)imgFileName = uploadImg(fileUp, path);
-        else car.setImgPath(currentConfiguration.getImgPath());
+        if(fileUp != null) {
+            imgFileName = uploadImg(fileUp, path);
+        }
+        else {
+            car.setImgPath(currentConfiguration.getImgPath());
+        }
+
         if(StringUtils.hasLength(imgFileName)) {
             deleteImg(currentConfiguration.getImgPath(), path);
             car.setImgPath(imgFileName);
@@ -83,7 +91,9 @@ public class ConfigurationService {
     }
 
     public void deleteConfiguration(long id) throws ConfigurationNotFoundException {
-        Configuration configuration = configurationRepository.findById(id).orElseThrow(() ->  new ConfigurationNotFoundException(id));
+        Configuration configuration = configurationRepository
+                .findById(id)
+                .orElseThrow(() ->  new ConfigurationNotFoundException(id));
         configuration.setCar(null);
 
         deleteImg(configuration.getImgPath(), path);
@@ -96,22 +106,29 @@ public class ConfigurationService {
                         .orElseThrow(() ->  new ConfigurationNotFoundException(id)));
     }
 
-    public String[] getFreeConfigurationsList(){
-        return configurationRepository.findAll().stream().filter(conf -> conf.getCar() == null)
-                .map(Configuration::getConfigurationName).toArray(String[]::new);
+    public List<String> getFreeConfigurationsList(){
+        return configurationRepository.findAll().stream()
+                .filter(conf -> conf.getCar() == null)
+                .map(Configuration::getConfigurationName)
+                .collect(toList());
     }
+
     public List<String> getBodyTypes(){
         return Arrays.stream(BodyType.values()).map(BodyType::toString).collect(toList());
     }
+
     public List<String> getCarClasses(){
         return Arrays.stream(CarClass.values()).map(CarClass::toString).collect(toList());
     }
+
     public List<String> getDriveTypes(){
         return Arrays.stream(DriveType.values()).map(DriveType::toString).collect(toList());
     }
+
     public List<String> getTransmissionTypes(){
         return Arrays.stream(TransmissionType.values()).map(TransmissionType::toString).collect(toList());
     }
+    
     public List<ConfigurationDto> getConfigurationsList(){
         return configurationRepository.findAll()
                 .stream().map(this::configurationDtoAddition)

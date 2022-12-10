@@ -25,6 +25,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    private static final String REQUEST_HEADER = "Authorization";
+
+    private static final String TOKEN_TYPE_STARTER = "Bearer ";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
@@ -45,9 +49,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request){
-        String headerAuth = request.getHeader("Authorization");
+        String headerAuth = request.getHeader(REQUEST_HEADER);
 
-        if(StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")){
+        if(StringUtils.hasText(headerAuth) && headerAuth.startsWith(TOKEN_TYPE_STARTER)){
             return headerAuth.substring(7);
         }
 
